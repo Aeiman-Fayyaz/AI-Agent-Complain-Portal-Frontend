@@ -9,6 +9,7 @@ import { CustomerDashboard } from './pages/CustomerDashboard';
 import { CreateTicketPage } from './pages/CreateTicketPage';
 import { AgentDashboard } from './pages/AgentDashboard';
 import { TicketDetailPage } from './pages/TicketDetailPage';
+import { HomePage } from './pages/HomePage';
 
 const getAuthorizedHomeRoute = (role?: string) => {
   if (role === 'customer') return '/customer';
@@ -34,7 +35,7 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode; allowedRoles?: strin
 
 const HomeRedirect: React.FC = () => {
   const { user } = useAuth();
-  if (!user) return <Navigate to="/login" replace />;
+  if (!user) return <HomePage />;
   return <Navigate to={getAuthorizedHomeRoute(user.role)} replace />;
 };
 
@@ -48,6 +49,7 @@ export const App: React.FC = () => {
             <main style={{ flex: 1 }}>
               <Routes>
                 <Route path="/" element={<HomeRedirect />} />
+                <Route path="/home" element={<HomePage />} />
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/register" element={<RegisterPage />} />
 
