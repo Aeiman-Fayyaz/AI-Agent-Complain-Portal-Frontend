@@ -135,11 +135,12 @@ export const HomePage: React.FC = () => {
           }
           .resolve-ai-footer-row {
             flex-direction: column !important;
-            align-items: flex-start !important;
+            align-items: center !important;
+            text-align: center !important;
           }
           .resolve-ai-footer-links {
             width: 100% !important;
-            justify-content: flex-start !important;
+            justify-content: center !important;
           }
           .resolve-ai-hero-panel {
             padding: 12px !important;
@@ -407,7 +408,7 @@ export const HomePage: React.FC = () => {
             </div>
           </div>
 
-          <div style={{ display: 'flex', gap: '18px', flexWrap: 'wrap', color: '#cbd5e1', fontSize: '0.9rem' }}>
+          <div className="resolve-ai-footer-links" style={{ display: 'flex', gap: '18px', flexWrap: 'wrap', color: '#cbd5e1', fontSize: '0.9rem', justifyContent: 'center' }}>
             <button onClick={() => navigate('/')} style={{ color: '#cbd5e1' }}>Home</button>
             <button onClick={() => navigate('/login')} style={{ color: '#cbd5e1' }}>Login</button>
             <button onClick={() => navigate('/register')} style={{ color: '#cbd5e1' }}>Sign Up</button>
