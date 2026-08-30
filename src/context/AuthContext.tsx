@@ -1,6 +1,10 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import axios from 'axios';
 import { User, UserRole } from '../types';
+import { getBackendUrl } from '../utils/config';
+
+// Configure Axios Base URL globally
+axios.defaults.baseURL = getBackendUrl();
 
 interface AuthContextType {
   user: User | null;
@@ -27,6 +31,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
+    // Ensure axios baseURL is synced
+    axios.defaults.baseURL = getBackendUrl();
+
     if (token) {
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
     } else {

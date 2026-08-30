@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { io, Socket } from 'socket.io-client';
 import { useAuth } from './AuthContext';
+import { getBackendUrl } from '../utils/config';
 
 interface SocketContextType {
   socket: Socket | null;
@@ -18,11 +19,16 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const { user } = useAuth();
 
   useEffect(() => {
-    // Initialize socket connection
-    const newSocket = io(window.location.origin.replace(':5173', ':5000'), {
-      transports: ['websocket', 'polling'],
-      reconnectionAttempts: 5,
-      reconnectionDelay: 1000
+    const backendUrl = getBackendUrl();
+    console.log('[SocketContext] Connecting to Socket.IO server at:', backendUrl);
+
+    // Initialize socket connection with HTTP polling fallback first, upgrading to WebSocket
+    const newSocket = io(backendUrl, {
+      transports: ['polling', 'websocket'], // Try HTTP polling first (firewall/CORS safe), then upgrade to WS
+      reconnectionAttempts: 10,
+      reconnectionDelay: 1000,
+      autoConnect: true,
+      withCredentials: true
     });
 
     newSocket.on('connect', () => {
@@ -31,6 +37,10 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       if (user && (user.role === 'agent' || user.role === 'admin')) {
         newSocket.emit('join_agent_dashboard');
       }
+    });
+
+    newSocket.on('connect_error', (err) => {
+      console.warn('[SocketContext] Connection warning (retrying via polling):', err.message);
     });
 
     newSocket.on('disconnect', () => {
