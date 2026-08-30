@@ -79,8 +79,74 @@ export const HomePage: React.FC = () => {
         .resolve-ai-glow { animation: pulseGlow 4s ease-in-out infinite; }
         .resolve-ai-card { transition: transform 0.2s ease, border-color 0.2s ease; }
         .resolve-ai-card:hover { transform: translateY(-4px); border-color: rgba(99, 102, 241, 0.4); }
+        @media (max-width: 1024px) {
+          .resolve-ai-hero {
+            grid-template-columns: 1fr !important;
+            gap: 24px !important;
+            padding: 18px 0 26px !important;
+          }
+          .resolve-ai-process-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+          }
+          .resolve-ai-split {
+            grid-template-columns: 1fr !important;
+          }
+          .resolve-ai-trust-grid {
+            grid-template-columns: 1fr !important;
+          }
+        }
+
         @media (max-width: 768px) {
-          .resolve-ai-grid { grid-template-columns: 1fr !important; }
+          .resolve-ai-grid {
+            grid-template-columns: 1fr !important;
+          }
+          .resolve-ai-process-grid {
+            grid-template-columns: 1fr !important;
+          }
+          .resolve-ai-hero-badges {
+            justify-content: center !important;
+          }
+          .resolve-ai-hero-badges span {
+            width: 100% !important;
+            justify-content: center !important;
+          }
+          .resolve-ai-actions,
+          .resolve-ai-cta-row {
+            flex-direction: column !important;
+          }
+          .resolve-ai-actions button,
+          .resolve-ai-cta-row button {
+            width: 100% !important;
+          }
+        }
+
+        @media (max-width: 560px) {
+          .resolve-ai-hero {
+            padding-top: 8px !important;
+          }
+          .resolve-ai-hero h1 {
+            font-size: clamp(2.3rem, 13vw, 3.5rem) !important;
+          }
+          .resolve-ai-hero .resolve-ai-subtitle {
+            font-size: clamp(1.1rem, 5vw, 1.6rem) !important;
+          }
+          .resolve-ai-hero .resolve-ai-description {
+            font-size: 0.98rem !important;
+          }
+          .resolve-ai-footer-row {
+            flex-direction: column !important;
+            align-items: flex-start !important;
+          }
+          .resolve-ai-footer-links {
+            width: 100% !important;
+            justify-content: flex-start !important;
+          }
+          .resolve-ai-hero-panel {
+            padding: 12px !important;
+          }
+          .resolve-ai-hero-panel .resolve-ai-chip-grid {
+            grid-template-columns: 1fr !important;
+          }
         }
       `}</style>
 
@@ -95,15 +161,15 @@ export const HomePage: React.FC = () => {
               ResolveAI
             </h1>
 
-            <div style={{ fontSize: 'clamp(1.4rem, 2.4vw, 2.2rem)', fontWeight: 700, color: '#e2e8f0', marginBottom: '18px' }}>
+            <div className="resolve-ai-subtitle" style={{ fontSize: 'clamp(1.4rem, 2.4vw, 2.2rem)', fontWeight: 700, color: '#e2e8f0', marginBottom: '18px' }}>
               Listen. Analyze. Resolve.
             </div>
 
-            <p style={{ maxWidth: '620px', color: '#cbd5e1', fontSize: '1.06rem', lineHeight: 1.8, marginBottom: '28px' }}>
+            <p className="resolve-ai-description" style={{ maxWidth: '620px', color: '#cbd5e1', fontSize: '1.06rem', lineHeight: 1.8, marginBottom: '28px' }}>
               ResolveAI brings customer complaints, AI triage, smart prioritization, actionable insights, and team workflows together in one premium resolution platform.
             </p>
 
-            <div style={{ display: 'flex', gap: '14px', flexWrap: 'wrap', marginBottom: '26px' }}>
+            <div className="resolve-ai-actions" style={{ display: 'flex', gap: '14px', flexWrap: 'wrap', marginBottom: '26px' }}>
               <button onClick={() => navigate('/register')} className="btn btn-primary" style={{ padding: '14px 22px', fontSize: '0.98rem' }}>
                 Get Started <ArrowRight size={18} />
               </button>
@@ -115,7 +181,7 @@ export const HomePage: React.FC = () => {
               </button>
             </div>
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: '18px', flexWrap: 'wrap', color: '#94a3b8', fontSize: '0.85rem' }}>
+            <div className="resolve-ai-hero-badges" style={{ display: 'flex', alignItems: 'center', gap: '18px', flexWrap: 'wrap', color: '#94a3b8', fontSize: '0.85rem' }}>
               <span style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}><Star size={14} color="#fbbf24" /> AI-powered triage</span>
               <span style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}><CircleDashed size={14} color="#67e8f9" /> Smart prioritization</span>
               <span style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}><Wand2 size={14} color="#a78bfa" /> Customer-first workflow</span>
@@ -125,7 +191,7 @@ export const HomePage: React.FC = () => {
           <div style={{ position: 'relative', display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '440px' }}>
             <div className="resolve-ai-glow" style={{ position: 'absolute', inset: '12% 16%', borderRadius: '50%', background: 'radial-gradient(circle, rgba(99,102,241,0.4) 0%, rgba(6,182,212,0.18) 35%, transparent 70%)', filter: 'blur(14px)' }} />
 
-            <div className="resolve-ai-float" style={{ position: 'relative', width: '100%', maxWidth: '440px', padding: '18px', borderRadius: '24px', background: 'rgba(15, 23, 42, 0.68)', border: '1px solid rgba(148, 163, 184, 0.18)', backdropFilter: 'blur(18px)', boxShadow: '0 24px 80px rgba(15, 23, 42, 0.5)' }}>
+            <div className="resolve-ai-float resolve-ai-hero-panel" style={{ position: 'relative', width: '100%', maxWidth: '440px', padding: '18px', borderRadius: '24px', background: 'rgba(15, 23, 42, 0.68)', border: '1px solid rgba(148, 163, 184, 0.18)', backdropFilter: 'blur(18px)', boxShadow: '0 24px 80px rgba(15, 23, 42, 0.5)' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '18px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                   <div style={{ width: '38px', height: '38px', borderRadius: '12px', background: 'linear-gradient(135deg, #6366f1 0%, #06b6d4 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -148,7 +214,7 @@ export const HomePage: React.FC = () => {
                 </div>
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: '12px' }}>
+              <div className="resolve-ai-chip-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: '12px' }}>
                 <div style={{ padding: '12px', borderRadius: '14px', background: 'rgba(99, 102, 241, 0.12)', border: '1px solid rgba(99, 102, 241, 0.25)' }}>
                   <div style={{ color: '#c7d2fe', fontSize: '0.72rem', marginBottom: '6px' }}>Category</div>
                   <div style={{ fontWeight: 700 }}>Billing</div>
@@ -175,7 +241,7 @@ export const HomePage: React.FC = () => {
             </p>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '18px', marginTop: '28px' }}>
+          <div className="resolve-ai-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '18px', marginTop: '28px' }}>
             <div className="glass-panel resolve-ai-card" style={{ padding: '28px', borderRadius: '22px' }}>
               <div style={{ display: 'inline-flex', alignItems: 'center', gap: '10px', marginBottom: '12px', color: '#7dd3fc' }}>
                 <Sparkles size={18} />
@@ -223,7 +289,7 @@ export const HomePage: React.FC = () => {
             <h2 style={{ fontSize: 'clamp(2rem, 4vw, 3rem)', fontWeight: 800 }}>A clear path from complaint to resolution.</h2>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gap: '16px' }}>
+          <div className="resolve-ai-process-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gap: '16px' }}>
             {processSteps.map((step) => (
               <div key={step.number} style={{ position: 'relative', padding: '26px 18px', borderRadius: '20px', background: 'rgba(15, 23, 42, 0.7)', border: '1px solid rgba(148, 163, 184, 0.12)' }}>
                 <div style={{ fontSize: '0.8rem', color: '#67e8f9', fontWeight: 800, letterSpacing: '0.08em', marginBottom: '10px' }}>{step.number}</div>
@@ -235,7 +301,7 @@ export const HomePage: React.FC = () => {
         </section>
 
         <section style={{ padding: '80px 0 30px' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.05fr', gap: '22px', alignItems: 'center' }}>
+          <div className="resolve-ai-split" style={{ display: 'grid', gridTemplateColumns: '1fr 1.05fr', gap: '22px', alignItems: 'center' }}>
             <div>
               <div style={{ color: '#93c5fd', textTransform: 'uppercase', letterSpacing: '0.08em', fontSize: '0.8rem', fontWeight: 700, marginBottom: '10px' }}>AI intelligence showcase</div>
               <h2 style={{ fontSize: 'clamp(2rem, 4vw, 3rem)', fontWeight: 800, marginBottom: '16px' }}>A smarter engine behind every complaint.</h2>
@@ -298,7 +364,7 @@ export const HomePage: React.FC = () => {
             <h2 style={{ fontSize: 'clamp(2rem, 4vw, 3rem)', fontWeight: 800 }}>Built for faster, smarter resolution.</h2>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '18px' }}>
+          <div className="resolve-ai-trust-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '18px' }}>
             {trustPoints.map((point) => (
               <div key={point} className="glass-panel" style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '20px 22px', borderRadius: '18px' }}>
                 <div style={{ width: '34px', height: '34px', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(16,185,129,0.12)', color: '#6ee7b7', border: '1px solid rgba(16,185,129,0.25)' }}>
@@ -317,7 +383,7 @@ export const HomePage: React.FC = () => {
             <p style={{ maxWidth: '660px', margin: '0 auto 22px', color: '#cbd5e1', lineHeight: 1.8 }}>
               ResolveAI gives your support team the context, visibility, and AI guidance needed to move from reactive support to confident, proactive resolution.
             </p>
-            <div style={{ display: 'flex', justifyContent: 'center', gap: '12px', flexWrap: 'wrap' }}>
+            <div className="resolve-ai-cta-row" style={{ display: 'flex', justifyContent: 'center', gap: '12px', flexWrap: 'wrap' }}>
               <button onClick={() => navigate('/register')} className="btn btn-primary" style={{ padding: '14px 22px', fontSize: '0.96rem' }}>
                 Get Started
               </button>
@@ -349,8 +415,8 @@ export const HomePage: React.FC = () => {
         </div>
 
         <div className="container" style={{ maxWidth: '1200px', margin: '26px auto 0', padding: '20px 20px 0', borderTop: '1px solid rgba(148, 163, 184, 0.1)', textAlign: 'center' }}>
-          <div style={{ color: '#64748b', fontSize: '0.85rem' }}>
-            Developed by <span style={{ fontWeight: 700, color: '#cbd5e1' }}>AEIMAN FAYYAZ</span>
+          <div className="resolve-ai-footer-row" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '16px', flexWrap: 'wrap', color: '#64748b', fontSize: '0.85rem' }}>
+            <div>Developed by <span style={{ fontWeight: 700, color: '#cbd5e1' }}>AEIMAN FAYYAZ</span></div>
           </div>
         </div>
       </footer>
