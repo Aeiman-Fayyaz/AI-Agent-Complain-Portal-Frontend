@@ -9,8 +9,11 @@ export const CustomerDashboard: React.FC = () => {
   const [tickets, setTickets] = useState<Ticket[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>('');
-  const [filterStatus, setFilterStatus] = useState<string>('All');
   const [searchQuery, setSearchQuery] = useState<string>('');
+  const [filterStatus, setFilterStatus] = useState<string>('All');
+  const [filterPriority, setFilterPriority] = useState<string>('All');
+  const [filterCategory, setFilterCategory] = useState<string>('All');
+  const [filterDate, setFilterDate] = useState<string>('all');
 
   const { socket } = useSocket();
 
@@ -49,13 +52,49 @@ export const CustomerDashboard: React.FC = () => {
     };
   }, [socket]);
 
+  const matchesDateRange = (ticketDate: string) => {
+    if (filterDate === 'all') return true;
+
+    const now = new Date();
+    const createdAt = new Date(ticketDate);
+    const diffDays = (now.getTime() - createdAt.getTime()) / (1000 * 60 * 60 * 24);
+
+    switch (filterDate) {
+      case 'today':
+        return createdAt.toDateString() === now.toDateString();
+      case '7days':
+        return diffDays <= 7 && diffDays >= 0;
+      case '30days':
+        return diffDays <= 30 && diffDays >= 0;
+      default:
+        return true;
+    }
+  };
+
+  const clearFilters = () => {
+    setSearchQuery('');
+    setFilterStatus('All');
+    setFilterPriority('All');
+    setFilterCategory('All');
+    setFilterDate('all');
+  };
+
   const filteredTickets = tickets.filter((ticket) => {
     const matchesStatus = filterStatus === 'All' || ticket.status === filterStatus;
+    const matchesPriority = filterPriority === 'All' || ticket.priority === filterPriority;
+    const matchesCategory = filterCategory === 'All' || ticket.category === filterCategory;
+    const matchesDate = matchesDateRange(ticket.createdAt);
+    const query = searchQuery.trim().toLowerCase();
     const matchesSearch =
-      ticket.ticketNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      ticket.subject.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      ticket.description.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesStatus && matchesSearch;
+      !query ||
+      ticket.ticketNumber.toLowerCase().includes(query) ||
+      ticket.subject.toLowerCase().includes(query) ||
+      ticket.description.toLowerCase().includes(query) ||
+      ticket.category.toLowerCase().includes(query) ||
+      ticket.priority.toLowerCase().includes(query) ||
+      ticket.aiSummary?.toLowerCase().includes(query);
+
+    return matchesStatus && matchesPriority && matchesCategory && matchesDate && matchesSearch;
   });
 
   const getStatusBadge = (status: TicketStatus) => {
@@ -93,34 +132,78 @@ export const CustomerDashboard: React.FC = () => {
       </div>
 
       {/* Filter and Search Bar */}
-      <div className="glass-panel" style={{ padding: '16px 20px', marginBottom: '24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '16px', flexWrap: 'wrap' }}>
-        
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flex: '1', minWidth: '260px' }}>
-          <Search size={18} color="var(--text-muted)" />
-          <input
-            type="text"
-            className="form-input"
-            placeholder="Search by ticket #, subject, description..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            style={{ border: 'none', background: 'transparent', padding: '6px 0', fontSize: '0.9rem' }}
-          />
+      <div className="glass-panel" style={{ padding: '16px 20px', marginBottom: '24px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', width: '100%' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flex: '1', minWidth: '260px' }}>
+            <Search size={18} color="var(--text-muted)" />
+            <input
+              type="text"
+              className="form-input"
+              placeholder="Search by ticket #, subject, description, category..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              style={{ border: 'none', background: 'transparent', padding: '6px 0', fontSize: '0.9rem' }}
+            />
+          </div>
+
+          <button
+            type="button"
+            onClick={clearFilters}
+            className="btn btn-secondary"
+            style={{ padding: '8px 12px', fontSize: '0.8rem' }}
+          >
+            Clear Filters
+          </button>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)', fontWeight: 600 }}>Filter Status:</span>
-          <select
-            className="form-select"
-            value={filterStatus}
-            onChange={(e) => setFilterStatus(e.target.value)}
-            style={{ width: 'auto', padding: '6px 12px', fontSize: '0.85rem' }}
-          >
-            <option value="All">All Statuses ({tickets.length})</option>
-            <option value="New">New</option>
-            <option value="Assigned">Assigned</option>
-            <option value="In Progress">In Progress</option>
-            <option value="Resolved">Resolved</option>
-          </select>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)', fontWeight: 600 }}>Category:</span>
+            <select className="form-select" value={filterCategory} onChange={(e) => setFilterCategory(e.target.value)} style={{ width: 'auto', padding: '6px 12px', fontSize: '0.85rem' }}>
+              <option value="All">All Categories</option>
+              <option value="Billing">Billing</option>
+              <option value="Technical">Technical</option>
+              <option value="Account">Account</option>
+              <option value="Feature Request">Feature Request</option>
+              <option value="General">General</option>
+            </select>
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)', fontWeight: 600 }}>Priority:</span>
+            <select className="form-select" value={filterPriority} onChange={(e) => setFilterPriority(e.target.value)} style={{ width: 'auto', padding: '6px 12px', fontSize: '0.85rem' }}>
+              <option value="All">All Priorities</option>
+              <option value="Critical">Critical</option>
+              <option value="High">High</option>
+              <option value="Medium">Medium</option>
+              <option value="Low">Low</option>
+            </select>
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)', fontWeight: 600 }}>Status:</span>
+            <select className="form-select" value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)} style={{ width: 'auto', padding: '6px 12px', fontSize: '0.85rem' }}>
+              <option value="All">All Statuses</option>
+              <option value="New">New</option>
+              <option value="Assigned">Assigned</option>
+              <option value="In Progress">In Progress</option>
+              <option value="Resolved">Resolved</option>
+            </select>
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)', fontWeight: 600 }}>Date:</span>
+            <select className="form-select" value={filterDate} onChange={(e) => setFilterDate(e.target.value)} style={{ width: 'auto', padding: '6px 12px', fontSize: '0.85rem' }}>
+              <option value="all">All Time</option>
+              <option value="today">Today</option>
+              <option value="7days">Last 7 Days</option>
+              <option value="30days">Last 30 Days</option>
+            </select>
+          </div>
+        </div>
+
+        <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
+          Showing {filteredTickets.length} of {tickets.length} complaints
         </div>
       </div>
 

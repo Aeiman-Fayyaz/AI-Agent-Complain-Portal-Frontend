@@ -9,7 +9,7 @@ export interface User {
 }
 
 export type TicketCategory = 'Billing' | 'Technical' | 'Account' | 'Feature Request' | 'General';
-export type TicketPriority = 'Low' | 'Medium' | 'High';
+export type TicketPriority = 'Low' | 'Medium' | 'High' | 'Critical';
 export type TicketStatus = 'New' | 'Assigned' | 'In Progress' | 'Resolved';
 
 export interface AISuggestions {
@@ -27,8 +27,9 @@ export interface Ticket {
   description: string;
   category: TicketCategory;
   priority: TicketPriority;
+  sentiment?: 'Positive' | 'Neutral' | 'Frustrated' | 'Angry' | 'Negative' | 'Urgent';
   aiSummary: string;
-  aiSuggestions: AISuggestions;
+  aiSuggestions: AISuggestions & { sentiment?: 'Positive' | 'Neutral' | 'Frustrated' | 'Angry' | 'Negative' | 'Urgent' };
   isAiApproved: boolean;
   status: TicketStatus;
   resolutionNote?: string;
@@ -54,5 +55,16 @@ export interface DashboardStats {
   highPriorityTickets: number;
   mediumPriorityTickets: number;
   lowPriorityTickets: number;
+  criticalPriorityTickets?: number;
   categories: Record<string, number>;
+}
+
+export interface AnalyticsData {
+  totalComplaints: number;
+  resolvedComplaints: number;
+  pendingComplaints: number;
+  criticalComplaints: number;
+  complaintsByCategory: Record<string, number>;
+  complaintsOverTime: Array<{ label: string; value: number }>;
+  averageResolutionTime: number;
 }

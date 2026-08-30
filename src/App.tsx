@@ -10,6 +10,11 @@ import { CreateTicketPage } from './pages/CreateTicketPage';
 import { AgentDashboard } from './pages/AgentDashboard';
 import { TicketDetailPage } from './pages/TicketDetailPage';
 
+const getAuthorizedHomeRoute = (role?: string) => {
+  if (role === 'customer') return '/customer';
+  return '/agent';
+};
+
 const ProtectedRoute: React.FC<{ children: React.ReactNode; allowedRoles?: string[] }> = ({
   children,
   allowedRoles
@@ -21,7 +26,7 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode; allowedRoles?: strin
   }
 
   if (allowedRoles && !allowedRoles.includes(user.role)) {
-    return <Navigate to={user.role === 'customer' ? '/customer' : '/agent'} replace />;
+    return <Navigate to={getAuthorizedHomeRoute(user.role)} replace />;
   }
 
   return <>{children}</>;
@@ -30,8 +35,7 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode; allowedRoles?: strin
 const HomeRedirect: React.FC = () => {
   const { user } = useAuth();
   if (!user) return <Navigate to="/login" replace />;
-  if (user.role === 'customer') return <Navigate to="/customer" replace />;
-  return <Navigate to="/agent" replace />;
+  return <Navigate to={getAuthorizedHomeRoute(user.role)} replace />;
 };
 
 export const App: React.FC = () => {
@@ -51,7 +55,7 @@ export const App: React.FC = () => {
                 <Route
                   path="/customer"
                   element={
-                    <ProtectedRoute allowedRoles={['customer', 'agent', 'admin']}>
+                    <ProtectedRoute allowedRoles={['customer']}>
                       <CustomerDashboard />
                     </ProtectedRoute>
                   }
@@ -59,7 +63,7 @@ export const App: React.FC = () => {
                 <Route
                   path="/customer/create"
                   element={
-                    <ProtectedRoute allowedRoles={['customer', 'agent', 'admin']}>
+                    <ProtectedRoute allowedRoles={['customer']}>
                       <CreateTicketPage />
                     </ProtectedRoute>
                   }

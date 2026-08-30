@@ -35,6 +35,7 @@ export const TicketDetailPage: React.FC = () => {
   const [isEditingAi, setIsEditingAi] = useState<boolean>(false);
   const [editCategory, setEditCategory] = useState<TicketCategory>('General');
   const [editPriority, setEditPriority] = useState<TicketPriority>('Medium');
+  const [editSentiment, setEditSentiment] = useState<string>('Neutral');
   const [editSummary, setEditSummary] = useState<string>('');
   const [savingAi, setSavingAi] = useState<boolean>(false);
 
@@ -65,6 +66,7 @@ export const TicketDetailPage: React.FC = () => {
         // Initialize AI edit form values
         setEditCategory(ticketData.category);
         setEditPriority(ticketData.priority);
+        setEditSentiment(ticketData.sentiment || 'Neutral');
         setEditSummary(ticketData.aiSummary || ticketData.subject);
       }
 
@@ -129,6 +131,7 @@ export const TicketDetailPage: React.FC = () => {
       const res = await axios.patch(`/api/tickets/${ticket._id}`, {
         category: editCategory,
         priority: editPriority,
+        sentiment: editSentiment,
         aiSummary: editSummary,
         isAiApproved: true
       });
@@ -260,11 +263,11 @@ export const TicketDetailPage: React.FC = () => {
           
           {/* Ticket Subject Card */}
           <div className="glass-panel" style={{ padding: '28px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px', gap: '12px', flexWrap: 'wrap' }}>
               <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.95rem', fontWeight: 800, color: 'var(--accent-cyan)' }}>
                 {ticket.ticketNumber}
               </span>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
                 <span className={`badge badge-${ticket.priority.toLowerCase()}`}>{ticket.priority} Priority</span>
                 <span className={`badge badge-${ticket.status.toLowerCase().replace(' ', '-')}`}>{ticket.status}</span>
               </div>
@@ -440,6 +443,13 @@ export const TicketDetailPage: React.FC = () => {
                   </div>
                 </div>
 
+                <div className="form-group" style={{ marginBottom: '12px' }}>
+                  <span className="form-label" style={{ fontSize: '0.75rem' }}>AI Sentiment</span>
+                  <div style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-primary)' }}>
+                    {ticket.sentiment || 'Neutral'}
+                  </div>
+                </div>
+
                 <div className="form-group" style={{ marginBottom: '18px' }}>
                   <span className="form-label" style={{ fontSize: '0.75rem' }}>AI Ticket Summary</span>
                   <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', background: 'rgba(255, 255, 255, 0.03)', padding: '10px', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-color)' }}>
@@ -485,6 +495,23 @@ export const TicketDetailPage: React.FC = () => {
                     <option value="Low">Low</option>
                     <option value="Medium">Medium</option>
                     <option value="High">High</option>
+                    <option value="Critical">Critical</option>
+                  </select>
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label">Sentiment</label>
+                  <select
+                    className="form-select"
+                    value={editSentiment}
+                    onChange={(e) => setEditSentiment(e.target.value)}
+                  >
+                    <option value="Positive">Positive</option>
+                    <option value="Neutral">Neutral</option>
+                    <option value="Frustrated">Frustrated</option>
+                    <option value="Angry">Angry</option>
+                    <option value="Negative">Negative</option>
+                    <option value="Urgent">Urgent</option>
                   </select>
                 </div>
 

@@ -177,6 +177,12 @@ input, select, textarea {
   border: 1px solid var(--priority-high-border);
 }
 
+.badge-critical {
+  background: rgba(239, 68, 68, 0.18);
+  color: #fca5a5;
+  border: 1px solid rgba(239, 68, 68, 0.4);
+}
+
 .badge-medium {
   background: var(--priority-med-bg);
   color: var(--priority-med-text);

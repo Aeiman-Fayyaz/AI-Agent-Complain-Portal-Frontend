@@ -1,8 +1,17 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { Bot, Sparkles, Send, ArrowLeft, AlertCircle } from 'lucide-react';
+import { Bot, Sparkles, Send, ArrowLeft, AlertCircle, TriangleAlert } from 'lucide-react';
 import { TicketCategory } from '../types';
+
+interface DuplicateMatch {
+  ticketNumber: string;
+  status: string;
+  category?: string;
+  summary?: string;
+  score: number;
+  reason?: string;
+}
 
 export const CreateTicketPage: React.FC = () => {
   const [subject, setSubject] = useState('');
@@ -10,11 +19,33 @@ export const CreateTicketPage: React.FC = () => {
   const [category, setCategory] = useState<string>('');
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
+  const [duplicateWarning, setDuplicateWarning] = useState<DuplicateMatch | null>(null);
   const navigate = useNavigate();
 
   const handleExampleClick = (exampleSubject: string, exampleDesc: string) => {
     setSubject(exampleSubject);
     setDescription(exampleDesc);
+  };
+
+  const submitTicket = async () => {
+    setSubmitting(true);
+    setError('');
+
+    try {
+      const res = await axios.post('/api/tickets', {
+        subject: subject.trim(),
+        description: description.trim(),
+        category: category || undefined
+      });
+
+      if (res.data.success) {
+        navigate(`/tickets/${res.data.data._id}`);
+      }
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'Failed to submit ticket');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -26,22 +57,21 @@ export const CreateTicketPage: React.FC = () => {
       return;
     }
 
-    setSubmitting(true);
     try {
-      const res = await axios.post('/api/tickets', {
+      const duplicateRes = await axios.post('/api/tickets/check-duplicate', {
         subject: subject.trim(),
         description: description.trim(),
         category: category || undefined
       });
 
-      if (res.data.success) {
-        // Navigate straight to the created ticket detail view
-        navigate(`/tickets/${res.data.data._id}`);
+      if (duplicateRes.data.success && duplicateRes.data.data?.isDuplicate && duplicateRes.data.data.match) {
+        setDuplicateWarning(duplicateRes.data.data.match);
+        return;
       }
+
+      await submitTicket();
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to submit ticket');
-    } finally {
-      setSubmitting(false);
+      setError(err.response?.data?.message || 'Unable to validate for duplicate complaints.');
     }
   };
 
@@ -127,6 +157,32 @@ export const CreateTicketPage: React.FC = () => {
           <div style={{ background: 'rgba(239, 68, 68, 0.12)', border: '1px solid rgba(239, 68, 68, 0.3)', color: '#f87171', padding: '12px 16px', borderRadius: 'var(--radius-md)', marginBottom: '20px', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
             <AlertCircle size={18} />
             <span>{error}</span>
+          </div>
+        )}
+
+        {duplicateWarning && (
+          <div style={{ background: 'rgba(245, 158, 11, 0.12)', border: '1px solid rgba(245, 158, 11, 0.3)', color: '#fbbf24', padding: '18px 16px', borderRadius: 'var(--radius-md)', marginBottom: '20px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '12px', fontWeight: 700 }}>
+              <TriangleAlert size={18} />
+              <span>Similar complaint detected</span>
+            </div>
+            <div style={{ marginBottom: '8px', color: 'var(--text-primary)' }}>
+              We found a complaint that may be related to this issue.
+            </div>
+            <div style={{ background: 'rgba(15, 23, 42, 0.5)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', padding: '12px 14px' }}>
+              <div style={{ fontWeight: 700, marginBottom: '4px' }}>Complaint #{duplicateWarning.ticketNumber}</div>
+              {duplicateWarning.category && <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '4px' }}>Category: {duplicateWarning.category}</div>}
+              <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '4px' }}>Status: {duplicateWarning.status}</div>
+              {duplicateWarning.summary && <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Summary: {duplicateWarning.summary}</div>}
+            </div>
+            <div style={{ display: 'flex', gap: '10px', marginTop: '16px', flexWrap: 'wrap' }}>
+              <button type="button" className="btn btn-secondary" onClick={() => setDuplicateWarning(null)} style={{ padding: '8px 12px' }}>
+                Cancel
+              </button>
+              <button type="button" className="btn btn-primary" onClick={async () => { setDuplicateWarning(null); await submitTicket(); }} style={{ padding: '8px 12px' }}>
+                Continue Anyway
+              </button>
+            </div>
           </div>
         )}
 
